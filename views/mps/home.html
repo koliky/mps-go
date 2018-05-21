@@ -1,0 +1,70 @@
+{{define "root-style"}}
+{{end}}
+{{define "root-body"}}
+<div id="body"></div>
+{{end}} {{define "root-script"}}
+<script>
+  Ext.onReady(function() {
+    var tb = new Ext.Toolbar({
+      columnWidth: 1,
+      items: [{
+        text: 'Menu',
+        iconCls: 'bmenu'
+      }]
+    });
+
+    var panel = new Ext.Panel({
+      renderTo: 'body',
+      title: 'MPS System',
+      style: '{text-align:center;}',
+      layout:'column',
+      tbar: [{
+        text:'MPS Menu',
+        iconCls: 'bmenu',
+        menu: [
+          {
+            text: 'Dashboard',
+            handler: function(){
+              window.location.href = '/mps';
+            }
+          },
+          {
+            text: 'Create Forcast',
+            handler: function(){
+              window.location.href = '/mps/createforcast';
+            }
+          },
+          {
+            text: 'Create Group',
+            handler: function(){
+              window.location.href = '/mps/creategroup';
+            }
+          },
+          {
+            text: 'Create Part',
+            handler: function(){
+              window.location.href = '/mps/createpart';
+            }
+          }
+        ]
+      },'->',{
+        text: localStorage.getItem('username'),
+        menu: [
+          {
+            text: 'Logout',
+            handler: function(){
+              localStorage.clear();
+              window.location.href = '/login';
+            }
+          }
+        ]
+      }]
+    });
+    var token = localStorage.getItem('token');
+    console.log(token);
+    if(token === null) {
+      window.location.href = '/login';
+    }
+  });
+</script>
+{{end}}
