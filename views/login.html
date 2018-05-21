@@ -1,0 +1,85 @@
+{{define "root-style"}}
+{{end}}
+{{define "root-body"}}
+<div id="body"></div>
+{{end}} {{define "root-script"}}
+<script>
+  Ext.onReady(function() {
+    var tb = new Ext.Toolbar({
+      columnWidth: 1,
+      items: [{
+        text: 'Menu',
+        iconCls: 'bmenu'
+      }]
+    });
+
+    var panel = new Ext.Panel({
+      renderTo: 'body',
+      title: 'MPS System',
+      style: '{text-align:center;}',
+      layout:'column'
+    });
+
+    var formLogin = new Ext.FormPanel({
+      labelWidth: 75,
+      frame:true,
+      width: 350,
+      defaults: {width: 230},
+      defaultType: 'textfield',
+      items: [
+        {
+          fieldLabel: 'Username',
+          name: 'username',
+          allowBlank:false,
+          id: 'username'
+        },
+        {
+          fieldLabel: 'Password',
+          name: 'password',
+          allowBlank:false,
+          inputType: 'password',
+          id: 'password'
+        }
+      ]
+    });
+
+    var windowLogin = new Ext.Window({
+      title: 'Login',
+      width: 350,
+      height:150,
+      layout: 'fit',
+      closable: false,
+      plain:true,
+      bodyStyle:'padding:5px;',
+      buttonAlign:'center',
+      items: formLogin,
+      buttons: [{
+          text: 'Login',
+          handler: function() {
+            var dataLogin = {
+              username: $('#username').val(),
+              password: $('#password').val()
+            }
+            $.ajax({
+              type: 'POST',
+              contentType: 'application/json; charset=utf-8',
+              dataType: "json",
+              url: 'http://128.199.89.58:9000/security/login',
+              data: JSON.stringify(dataLogin),
+              success: function(result) {
+                localStorage.setItem('token' , result.token);
+                localStorage.setItem('username' , result.username);
+                window.location.href = '/mps';
+              },
+              error: function(err) {
+                console.log(err);
+              }
+            })
+          }
+      }]
+    });
+
+    windowLogin.show();
+  });
+</script>
+{{end}}

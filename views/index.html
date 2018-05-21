@@ -1,0 +1,88 @@
+{{define "root-style"}}
+<link rel="stylesheet" href="/-/core/extjs/examples/desktop/css/desktop.css" />
+<script src="/-/core/extjs/examples/desktop/js/StartMenu.js"></script>
+<script src="/-/core/extjs/examples/desktop/js/TaskBar.js"></script>
+<script src="/-/core/extjs/examples/desktop/js/Desktop.js"></script>
+<script src="/-/core/extjs/examples/desktop/js/App.js"></script>
+<script src="/-/core/extjs/examples/desktop/js/Module.js"></script>
+{{end}}
+{{define "root-body"}}
+<div id="x-desktop">
+  <dl id="x-shortcuts">
+    <dt id="mps-win-shortcut">
+      <a href="#" ondblclick="return openNewWindow();"><img src="/-/core/extjs/examples/desktop/images/s.gif" />
+        <div>MPS System</div></a>
+    </dt>
+  </dl>
+</div>
+<div id="ux-taskbar">
+  <div id="ux-taskbar-start"></div>
+  <div id="ux-taskbuttons-panel"></div>
+  <div class="x-clear"></div>
+</div>
+{{end}} {{define "root-script"}}
+<script>
+
+  function openNewWindow() {
+    var w = 1000;
+    var h = 650;
+    var left = (screen.width/2)-(w/2);
+    var top = (screen.height/2)-(h/2);
+    // window.open('/login','winname','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width='+w+',height='+h+',top='+top+',left='+left);
+    var token = localStorage.getItem('token');
+    console.log(token);
+    if(token === null) {
+      window.open('/login','winname','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1000,height=650');
+    } else {
+      window.open('/mps','winname','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1000,height=650');
+    }
+  }
+
+  MyDesktop = new Ext.app.App({
+    init :function(){
+		  Ext.QuickTips.init();
+    },
+    getModules : function(){
+      return [
+      new MyDesktop.BogusModule()
+      ]
+    },
+    getStartConfig : function(){
+      return {
+        title: 'Foamtec International',
+        iconCls: 'user'
+      }
+    }
+  });
+
+  MyDesktop.BogusModule = Ext.extend(Ext.app.Module, {
+    init : function(){
+      this.launcher = {
+        text: 'Window',
+        iconCls:'bogus',
+        handler : this.createWindow,
+        scope: this,
+        windowId:'windowIndex'
+      }
+    },
+    createWindow : function(src){
+      var desktop = this.app.getDesktop();
+      var win = desktop.getWindow('bogus'+src.windowId);
+      if(!win){
+        win = desktop.createWindow({
+          id: 'bogus'+src.windowId,
+          title:src.text,
+          width:640,
+          height:480,
+          html : '<p>Something useful would be in here.</p>',
+          iconCls: 'bogus',
+          shim:false,
+          animCollapse:false,
+          constrainHeader:true
+        });
+      }
+      win.show();
+    }
+  });
+</script>
+{{end}}
