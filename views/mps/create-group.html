@@ -5,13 +5,28 @@
 {{end}} {{define "root-script"}}
 <script>
   Ext.onReady(function() {
+
+    var panel = new Ext.Panel({
+      renderTo: 'content',
+      layout: 'column',
+      items: [
+        {
+          columnWidth: .3,
+          html: '<div id="formGroup"></div>'
+        },
+        {
+          columnWidth: .7,
+          html: '<div id="gridGroup"></div>'
+        }
+      ]
+    });
     
-    var formGroup = new Ext.FormPanel({
+    var formCreateGroup = new Ext.FormPanel({
+      renderTo: 'formGroup',
       labelWidth: 75,
       title: 'Add Group',
-      width: 350,
       frame:true,
-      defaults: {width: 230},
+      defaults: {width: 200},
       items: [
         {
           xtype: 'textfield',
@@ -41,67 +56,62 @@
       },{
         text: 'Clear',
         handler: function() {
-          window.location.href = "/mps/creategroup";
+          formCreateGroup.getForm().reset();
         }
       }]
     });
 
-    var groupPanel = new Ext.Panel({
-      frame:true,
-      columnWidth: 1,
-      height: 650,
-      style: '{text-align:left;}',
-      items: [
-        formGroup
+    var store = new Ext.data.ArrayStore({
+      fields: [
+        { name: 'no' },
+        { name: 'groupName' },
+        { name: 'typeName' },
+        { name: 'totalPart' }
       ]
     });
 
-    var tb = new Ext.Toolbar({
-      columnWidth: 1,
-      items: [{
-        text: 'Menu',
-        iconCls: 'bmenu'
-      }]
-    });
-
-    var panel = new Ext.Panel({
-      renderTo: 'body',
-      title: 'MPS System',
-      style: '{text-align:center;}',
-      layout:'column',
-      tbar: [{
-        text:'MPS Menu',
-        iconCls: 'bmenu',
-        menu: [
-          {
-            text: 'Dashboard',
-            handler: function(){
-              window.location.href = "/mps";
-            }
-          },
-          {
-            text: 'Create Forcast',
-            handler: function(){
-              window.location.href = "/mps/createforcast";
-            }
-          },
-          {
-            text: 'Create Group',
-            handler: function(){
-              window.location.href = "/mps/creategroup";
-            }
-          },
-          {
-            text: 'Create Part',
-            handler: function(){
-              window.location.href = "/mps/createpart";
-            }
-          }
-        ]
-      }],
-      items: [
-        groupPanel
-      ]
+    new Ext.grid.GridPanel({
+      renderTo: 'gridGroup',
+      height:500,
+      store: store,
+      trackMouseOver:false,
+      disableSelection:true,
+      loadMask: true,
+      title:'Group list',
+      columns:[
+        {
+          id: 'no',
+          header: '#',
+          dataIndex: 'no',
+          width    : 50,
+        },
+        {
+          id: 'groupName',
+          header: 'Group Name',
+          dataIndex: 'groupName',
+          sortable: true,
+          width    : 200,
+        },
+        {
+          id: 'typeName',
+          header: 'Type Name',
+          dataIndex: 'typeName',
+          width    : 200,
+        },
+        {
+          id: 'totalPart',
+          header: 'Total Part',
+          dataIndex: 'totalPart',
+          width    : 150,
+        }
+      ],
+      bbar: new Ext.PagingToolbar({
+        pageSize: 25,
+        store: store,
+        displayInfo: true,
+        displayMsg: 'Displaying data {0} - {1} of {2}',
+        emptyMsg: "No data to display"
+      })
     });
   });
 </script>

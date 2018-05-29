@@ -1,0 +1,136 @@
+{{define "root-style"}}
+{{end}}
+{{define "root-body"}}
+{{end}} {{define "root-script"}}
+<script>
+  Ext.onReady(function() {
+    var panel = new Ext.Panel({
+      renderTo: 'content',
+      layout: 'column',
+      items: [
+        {
+          columnWidth: 1,
+          html: '<div id="gridUser"></div>'
+        }
+      ]
+    });
+
+    var store = new Ext.data.JsonStore({
+      fields: [
+        { name: 'id' },
+        { name: 'no' },
+        { name: 'firstName' },
+        { name: 'lastName' },
+        { name: 'employeeId' },
+        { name: 'email' },
+        { name: 'department' },
+        { name: 'role' }
+      ],
+      root: 'users',
+      totalProperty: 'totalUsers',
+      proxy: new Ext.data.HttpProxy({
+        method: 'GET',
+        type: 'json',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': localStorage.getItem('token')
+        },
+        url: '{{.api_url}}/api/admin/finduserlimit'
+      })
+    });
+
+    new Ext.grid.GridPanel({
+      renderTo: 'gridUser',
+      height:500,
+      store: store,
+      trackMouseOver:false,
+      disableSelection:true,
+      loadMask: true,
+      title:'User list',
+      columns:[
+        {
+          id: 'id',
+          header: 'id',
+          dataIndex: 'id',
+          width    : 10,
+          hidden: true
+        },
+        {
+          id: 'no',
+          header: '#',
+          dataIndex: 'no',
+          width    : 50
+        },
+        {
+          id: 'firstName',
+          header: 'First Name',
+          dataIndex: 'firstName',
+          sortable: true,
+          width    : 150
+        },
+        {
+          id: 'lastName',
+          header: 'Last Name',
+          dataIndex: 'lastName',
+          width    : 150
+        },
+        {
+          id: 'employeeId',
+          header: 'Employee ID',
+          dataIndex: 'employeeId',
+          width    : 150
+        },
+        {
+          id: 'email',
+          header: 'Email',
+          dataIndex: 'email',
+          width    : 200
+        },
+        {
+          id: 'department',
+          header: 'Department',
+          dataIndex: 'department',
+          width    : 150
+        },
+        {
+          id: 'role',
+          header: 'Role',
+          dataIndex: 'role',
+          width    : 80
+        },
+        {
+          xtype: 'actioncolumn',
+          header: 'Action',
+          width: 50,
+          items: [
+            {
+              icon: '/-/core/extjs/examples/icons/fam/rss_go.png',
+              tooltip: 'go to infomation',
+              handler: function(grid, rowIndex, colIndex) {
+                var rec = store.getAt(rowIndex);
+                window.location.href = '/admin/showuser?id=' + rec.get('id');
+              }
+            },
+            {
+              icon: '/-/core/extjs/examples/icons/fam/cog_edit.png',
+              tooltip: 'update user',
+              handler: function(grid, rowIndex, colIndex) {
+                var rec = store.getAt(rowIndex);
+                window.location.href = '/admin/updateuser?id=' + rec.get('id');
+              }
+            }
+          ]
+        }
+      ],
+      bbar: new Ext.PagingToolbar({
+        pageSize: 20,
+        store: store,
+        displayInfo: true,
+        displayMsg: 'Displaying data {0} - {1} of {2}',
+        emptyMsg: "No data to display"
+      })
+    });
+    store.load({params:{start:0, limit:20}});
+  });
+</script>
+{{end}}

@@ -26,3 +26,23 @@ func MpsCreateForcast(w http.ResponseWriter, data interface{}) {
 func MpsCreateGroup(w http.ResponseWriter, data interface{}) {
 	render(parseTemplate("mps/create-group.html"), w, data)
 }
+
+// AdminCreateUser render view
+func AdminCreateUser(w http.ResponseWriter, data interface{}) {
+	render(parseTemplate("admin/create-user.html"), w, data)
+}
+
+// AdminListUser render view
+func AdminListUser(w http.ResponseWriter, data interface{}) {
+	render(parseTemplate("admin/list-user.html"), w, data)
+}
+
+// AdminShowUser render view
+func AdminShowUser(w http.ResponseWriter, data interface{}) {
+	render(parseTemplate("admin/show-user.html"), w, data)
+}
+
+// AdminUpdateUser render view
+func AdminUpdateUser(w http.ResponseWriter, data interface{}) {
+	render(parseTemplate("admin/update-user.html"), w, data)
+}

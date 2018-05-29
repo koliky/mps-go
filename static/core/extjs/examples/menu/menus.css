@@ -49,11 +49,20 @@ Build date: 2013-04-03 15:07:25
 }
 
 .user {
-    background-image:url(../shared/icons/fam/user.gif) !important
+    background-image:url(../icons/fam/user.gif) !important
 }
 .edit {
     background-image:url(../desktop/images/im32x32.gif) !important;
 }
 .add {
     background-image:url(../button/images/add.gif) !important;
+}
+
+.badmin {
+    background-image:url(../icons/fam/cog.png) !important
+}
+
+.x-window-dlg .ext-mb-download {
+    background:transparent url(../icons/download.gif) no-repeat top left;
+    height:46px;
 }
