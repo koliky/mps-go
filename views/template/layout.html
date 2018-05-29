@@ -1,0 +1,102 @@
+{{define "root-layout"}}
+<div id="body"></div>
+<script>
+  Ext.onReady(function() {
+
+    var token = localStorage.getItem('token');
+    if(token === null) {
+      window.location.href = '/login';
+    }
+
+    var adminMenuHidden = true;
+    var role = localStorage.getItem('role');
+    if (role.indexOf('Admin') >= 0) {
+      adminMenuHidden = false;
+    }
+
+    var adminMenu = {
+      text:'Admin',
+      iconCls: 'badmin',
+      hidden: adminMenuHidden,
+      menu: [
+        {
+          text: 'Create User',
+          handler: function(){
+            window.location.href = '/admin/createuser';
+          }
+        },
+        {
+          text: 'List User',
+          handler: function(){
+            window.location.href = '/admin/listuser';
+          }
+        }
+      ]
+    }
+
+    var tb = new Ext.Toolbar({
+      columnWidth: 1,
+      items: [{
+        text: 'Menu',
+        iconCls: 'bmenu'
+      }]
+    });
+
+    var mainPanel = new Ext.Panel({
+      frame:true,
+      columnWidth: 1,
+      height: 650,
+      style: '{text-align:left;}',
+      items: [
+        {
+          html: '<br><div id="content"></div>'
+        }
+      ]
+    });
+
+    var panelMenu = new Ext.Panel({
+      renderTo: 'body',
+      title: 'MPS System',
+      style: '{text-align:center;}',
+      layout:'column',
+      tbar: [{
+        text:'MPS',
+        iconCls: 'bmenu',
+        menu: [
+          {
+            text: 'Dashboard',
+            handler: function(){
+              window.location.href = '/mps';
+            }
+          },
+          {
+            text: 'Create Forcast',
+            handler: function(){
+              window.location.href = '/mps/createforcast';
+            }
+          },
+          {
+            text: 'Add Group or Part',
+            handler: function(){
+              window.location.href = '/mps/creategroup';
+            }
+          }
+        ]
+      },adminMenu,'->',{
+        text: localStorage.getItem('username'),
+        iconCls: 'user',
+        menu: [
+          {
+            text: 'Logout',
+            handler: function(){
+              localStorage.clear();
+              window.location.href = '/login';
+            }
+          }
+        ]
+      }],
+      items: [mainPanel]
+    });
+  });
+</script>
+{{end}}

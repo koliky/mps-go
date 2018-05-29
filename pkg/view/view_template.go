@@ -36,7 +36,12 @@ func joinTemplateDir(files ...string) []string {
 func parseTemplate(file string) *template.Template {
 	rootTemplate := []string{
 		"template/root.html",
-		"template/header.html",
+		"template/layout.html",
+	}
+	if file == "index.html" || file == "login.html" {
+		rootTemplate = []string{
+			"template/root.html",
+		}
 	}
 	filesOutput := joinTemplateDir(append(rootTemplate, file)...)
 	t := template.New("")

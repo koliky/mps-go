@@ -6,9 +6,12 @@ import (
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{
+		"api_url": apiURL,
+	}
 	if r.RequestURI != "/" {
 		http.NotFound(w, r)
 		return
 	}
-	view.Index(w, nil)
+	view.Index(w, data)
 }

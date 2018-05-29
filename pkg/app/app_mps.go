@@ -6,13 +6,22 @@ import (
 )
 
 func mpsHome(w http.ResponseWriter, r *http.Request) {
-	view.MpsHome(w, nil)
+	data := map[string]interface{}{
+		"api_url": apiURL,
+	}
+	view.MpsHome(w, data)
 }
 
 func mpsCreateForcast(w http.ResponseWriter, r *http.Request) {
-	view.MpsCreateForcast(w, nil)
+	data := map[string]interface{}{
+		"api_url": apiURL,
+	}
+	view.MpsCreateForcast(w, data)
 }
 
 func mpsCreateGroup(w http.ResponseWriter, r *http.Request) {
-	view.MpsCreateGroup(w, nil)
+	data := map[string]interface{}{
+		"api_url": apiURL,
+	}
+	view.MpsCreateGroup(w, data)
 }

@@ -6,5 +6,8 @@ import (
 )
 
 func login(w http.ResponseWriter, r *http.Request) {
-	view.Login(w, nil)
+	data := map[string]interface{}{
+		"api_url": apiURL,
+	}
+	view.Login(w, data)
 }
