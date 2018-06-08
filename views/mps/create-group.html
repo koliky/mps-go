@@ -51,7 +51,65 @@
       buttons: [{
         text: 'Add Group',
         handler: function() {
-          console.log('add group');
+          formCreateGroup.getForm().submit();
+          var groupNameF = $('#groupName').val();
+          var typeNameF = $('#typeName').val();
+
+          if(groupNameF.length < 1 || groupNameF.indexOf('Enter group name ...') >= 0) {
+            return false;
+          }
+
+          if(typeNameF.length < 1 || typeNameF.indexOf('Select a type...') >= 0) {
+            return false;
+          }
+
+          var dataGroup = {
+            groupName: groupNameF,
+            groupType: typeNameF
+          }
+
+          Ext.MessageBox.show({
+            msg: 'Saving your data, please wait...',
+            progressText: 'Saving...',
+            width:300,
+            wait:true,
+            waitConfig: {interval:200},
+            icon:'ext-mb-download',
+            animEl: 'mb7'
+          });
+
+          $.ajax({
+            type: 'POST',
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Authorization': localStorage.getItem('token')
+            },
+            dataType: "json",
+            url: '{{.api_url}}/api/mps/creategroup',
+            data: JSON.stringify(dataGroup),
+            success: function(result) {
+              console.log(result.message)
+              Ext.MessageBox.hide();
+              window.location.href = '/mps/creategroup';
+            },
+            error: function(err) {
+              Ext.MessageBox.hide();
+              var resErr = err.responseJSON;
+              if(resErr.message.indexOf("save fail") >= 0) {
+                Ext.MessageBox.show({
+                  title: 'Warning',
+                  msg: resErr.message,
+                  buttons: Ext.MessageBox.OK,
+                  animEl: 'mb9',
+                  icon: Ext.MessageBox.WARNING
+                });
+              }
+              if(resErr.message.indexOf("token fail") >= 0) {
+                localStorage.clear();
+                window.location.href = '/login';
+              }
+            }
+          });
         }
       },{
         text: 'Clear',
@@ -61,13 +119,25 @@
       }]
     });
 
-    var store = new Ext.data.ArrayStore({
+    var store = new Ext.data.JsonStore({
       fields: [
+        { name: 'id' },
         { name: 'no' },
         { name: 'groupName' },
         { name: 'typeName' },
         { name: 'totalPart' }
-      ]
+      ],
+      root: 'groups',
+      totalProperty: 'totalGroups',
+      proxy: new Ext.data.HttpProxy({
+        method: 'GET',
+        type: 'json',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': localStorage.getItem('token')
+        },
+        url: '{{.api_url}}/api/mps/searchgroupslimit'
+      })
     });
 
     new Ext.grid.GridPanel({
@@ -80,39 +150,83 @@
       title:'Group list',
       columns:[
         {
+          id: 'id',
+          header: 'id',
+          dataIndex: 'id',
+          width    : 10,
+          hidden: true
+        },
+        {
           id: 'no',
           header: '#',
           dataIndex: 'no',
-          width    : 50,
+          width    : 50
         },
         {
           id: 'groupName',
           header: 'Group Name',
           dataIndex: 'groupName',
           sortable: true,
-          width    : 200,
+          width    : 200
         },
         {
           id: 'typeName',
           header: 'Type Name',
           dataIndex: 'typeName',
-          width    : 200,
+          width    : 200
         },
         {
           id: 'totalPart',
           header: 'Total Part',
           dataIndex: 'totalPart',
-          width    : 150,
+          width    : 150
+        },
+        {
+          xtype: 'actioncolumn',
+          header: 'Add Part',
+          width: 85,
+          items: [
+            {
+              icon: '/-/core/extjs/examples/icons/fam/rss_go.png',
+              tooltip: 'go to infomation',
+              handler: function(grid, rowIndex, colIndex) {
+                var rec = store.getAt(rowIndex);
+                window.location.href = '/mps/createpart?id=' + rec.get('id') + '&search=';
+              }
+            }
+          ]
         }
       ],
       bbar: new Ext.PagingToolbar({
-        pageSize: 25,
+        pageSize: 20,
         store: store,
         displayInfo: true,
         displayMsg: 'Displaying data {0} - {1} of {2}',
-        emptyMsg: "No data to display"
+        emptyMsg: "No data to display",
+        items: ['-',
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Search',
+            name: 'search',
+            id: 'search',
+            value: '{{.search}}'
+          },
+          {
+            xtype: 'button',
+            name: 'btnSearch',
+            id: 'btnSearch',
+            text: 'Search',
+            pressed: true,
+            handler: function() {
+              window.location.href = '/mps/creategroup?search=' + $('#search').val();
+            }
+          }
+        ]
       })
     });
+
+    store.baseParams = {searchText: '{{.search}}'};
+    store.load({params:{start:0, limit:20, searchText: '{{.search}}'}});
   });
 </script>
 {{end}}

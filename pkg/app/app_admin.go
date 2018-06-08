@@ -16,6 +16,8 @@ func adminListUser(w http.ResponseWriter, r *http.Request) {
 	data := map[string]interface{}{
 		"api_url": apiURL,
 	}
+	search := r.URL.Query().Get("search")
+	data["search"] = search
 	view.AdminListUser(w, data)
 }
 

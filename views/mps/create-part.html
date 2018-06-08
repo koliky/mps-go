@@ -1,0 +1,265 @@
+{{define "root-style"}}
+{{end}}
+{{define "root-body"}}
+<div id="body"></div>
+{{end}} {{define "root-script"}}
+<script>
+  Ext.onReady(function() {
+
+    var panel = new Ext.Panel({
+      renderTo: 'content',
+      layout: 'column',
+      items: [
+        {
+          columnWidth: .3,
+          html: '<div id="formPart"></div>'
+        },
+        {
+          columnWidth: .7,
+          html: '<div id="gridPart"></div>'
+        }
+      ]
+    });
+    
+    var formCreatePart = new Ext.FormPanel({
+      renderTo: 'formPart',
+      labelWidth: 75,
+      title: 'Add Part',
+      frame:true,
+      defaults: {width: 200},
+      items: [
+        {
+          xtype: 'textfield',
+          fieldLabel: 'Group Name',
+          name: 'groupName',
+          allowBlank: false,
+          id: 'groupName',
+          readOnly: true,
+          style: 'background: #ecf0f1;'
+        },
+        {
+          xtype: 'textfield',
+          fieldLabel: 'Group Type',
+          name: 'groupType',
+          allowBlank: false,
+          id: 'groupType',
+          readOnly: true,
+          style: 'background: #ecf0f1;'
+        },
+        {
+          xtype: 'textfield',
+          fieldLabel: 'Part Number',
+          name: 'part',
+          allowBlank: false,
+          id: 'part',
+        },
+        {
+          xtype: 'textfield',
+          fieldLabel: 'Part Name',
+          name: 'partName',
+          allowBlank: false,
+          id: 'partName',
+        },
+        {
+          xtype: 'textfield',
+          fieldLabel: 'Code SAP',
+          name: 'codeSap',
+          allowBlank: false,
+          id: 'codeSap',
+        }
+      ],
+      buttons: [{
+        text: 'Add Part',
+        handler: function() {
+          formCreatePart.getForm().submit();
+          var partP = $('#part').val();
+          var partNameP = $('#partName').val();
+          var codeSapP = $('#codeSap').val();
+
+          if(partP.length < 1) {
+            return false;
+          }
+          if(partNameP.length < 1) {
+            return false;
+          }
+          if(codeSapP.length < 1) {
+            return false;
+          }
+
+          var dataPart = {
+            id: '{{.id}}',
+            partNo: partP,
+            partName: partNameP,
+            codeSap: codeSapP
+          }
+
+          Ext.MessageBox.show({
+            msg: 'Saving your data, please wait...',
+            progressText: 'Saving...',
+            width:300,
+            wait:true,
+            waitConfig: {interval:200},
+            icon:'ext-mb-download',
+            animEl: 'mb7'
+          });
+
+          $.ajax({
+            type: 'POST',
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Authorization': localStorage.getItem('token')
+            },
+            dataType: "json",
+            url: '{{.api_url}}/api/mps/createpart',
+            data: JSON.stringify(dataPart),
+            success: function(result) {
+              console.log(result.message)
+              Ext.MessageBox.hide();
+              window.location.href = '/mps/createpart?id={{.id}}';
+            },
+            error: function(err) {
+              Ext.MessageBox.hide();
+              var resErr = err.responseJSON;
+              Ext.MessageBox.show({
+                title: 'Warning',
+                msg: resErr.message,
+                buttons: Ext.MessageBox.OK,
+                animEl: 'mb9',
+                icon: Ext.MessageBox.WARNING
+              });
+              if(resErr.message.indexOf("token fail") >= 0) {
+                localStorage.clear();
+                window.location.href = '/login';
+              }
+            }
+          });
+        }
+      },{
+        text: 'Clear',
+        handler: function() {
+          formCreatePart.getForm().reset();
+        }
+      }]
+    });
+
+    var store = new Ext.data.JsonStore({
+      fields: [
+        { name: 'id' },
+        { name: 'no' },
+        { name: 'partNumber' },
+        { name: 'partName' },
+        { name: 'codeSap' }
+      ],
+      root: 'parts',
+      totalProperty: 'totalParts',
+      proxy: new Ext.data.HttpProxy({
+        method: 'GET',
+        type: 'json',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': localStorage.getItem('token')
+        },
+        url: '{{.api_url}}/api/mps/searchproductsbygrouplimit'
+      })
+    });
+
+    new Ext.grid.GridPanel({
+      renderTo: 'gridPart',
+      height:500,
+      store: store,
+      trackMouseOver:false,
+      disableSelection:true,
+      loadMask: true,
+      title:'Part list',
+      columns:[
+        {
+          id: 'id',
+          header: 'id',
+          dataIndex: 'id',
+          width    : 10,
+          hidden: true
+        },
+        {
+          id: 'no',
+          header: '#',
+          dataIndex: 'no',
+          width    : 50
+        },
+        {
+          id: 'partNumber',
+          header: 'Part Number',
+          dataIndex: 'partNumber',
+          width    : 200
+        },
+        {
+          id: 'partName',
+          header: 'Part Name',
+          dataIndex: 'partName',
+          width    : 270
+        },
+        {
+          id: 'codeSap',
+          header: 'Code SAP',
+          dataIndex: 'codeSap',
+          width    : 170
+        }
+      ],
+      bbar: new Ext.PagingToolbar({
+        pageSize: 20,
+        store: store,
+        displayInfo: true,
+        displayMsg: 'Displaying data {0} - {1} of {2}',
+        emptyMsg: "No data to display",
+        items: [
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Search',
+            name: 'search',
+            id: 'search',
+            value: '{{.search}}'
+          },
+          {
+            xtype: 'button',
+            name: 'btnSearch',
+            id: 'btnSearch',
+            text: 'Search',
+            pressed: true,
+            handler: function() {
+              window.location.href = '/mps/createpart?id={{.id}}&search=' + $('#search').val();
+            }
+          }
+        ]
+      })
+    });
+    store.baseParams = {searchText: '{{.search}}'};
+    store.load({params:{start:0, limit:20, id:'{{.id}}'}, searchText: '{{.search}}'});
+
+    var myMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
+    myMask.show();
+
+    $.ajax({
+      type: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': localStorage.getItem('token')
+      },
+      dataType: 'json',
+      url: '{{.api_url}}/api/mps/findgroupbyid',
+      data: JSON.stringify({'id': '{{.id}}'}),
+      success: function(result) {
+        $('#groupName').val(result.groupName);
+        $('#groupType').val(result.groupType);
+        myMask.hide();
+      },
+      error: function(err) {
+        myMask.hide();
+        var resErr = err.responseJSON;
+        if(resErr.message.indexOf('token fail') >= 0) {
+          localStorage.clear();
+          window.location.href = '/login';
+        }
+      }
+    });
+  });
+</script>
+{{end}}

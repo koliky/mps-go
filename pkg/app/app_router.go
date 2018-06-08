@@ -20,6 +20,7 @@ func CreateRouter(mux *http.ServeMux) {
 	midelwareMux.HandleFunc("/mps", mpsHome)
 	midelwareMux.HandleFunc("/mps/createforcast", mpsCreateForcast)
 	midelwareMux.HandleFunc("/mps/creategroup", mpsCreateGroup)
+	midelwareMux.HandleFunc("/mps/createpart", mpsCreatePart)
 	midelwareMux.HandleFunc("/admin/createuser", adminCreateUser)
 	midelwareMux.HandleFunc("/admin/listuser", adminListUser)
 	midelwareMux.HandleFunc("/admin/showuser", adminShowUser)

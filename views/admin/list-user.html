@@ -35,7 +35,7 @@
           'Content-Type': 'application/json; charset=utf-8',
           'Authorization': localStorage.getItem('token')
         },
-        url: '{{.api_url}}/api/admin/finduserlimit'
+        url: '{{.api_url}}/api/admin/searchuserslimit'
       })
     });
 
@@ -127,10 +127,30 @@
         store: store,
         displayInfo: true,
         displayMsg: 'Displaying data {0} - {1} of {2}',
-        emptyMsg: "No data to display"
+        emptyMsg: "No data to display",
+        items: ['-',
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Search',
+            name: 'search',
+            id: 'search',
+            value: '{{.search}}'
+          },
+          {
+            xtype: 'button',
+            name: 'btnSearch',
+            id: 'btnSearch',
+            text: 'Search',
+            pressed: true,
+            handler: function() {
+              window.location.href = '/admin/listuser?search=' + $('#search').val();
+            }
+          }
+        ]
       })
     });
-    store.load({params:{start:0, limit:20}});
+    store.baseParams = {searchText: '{{.search}}'};
+    store.load({params:{start:0, limit:20, searchText: '{{.search}}'}});
   });
 </script>
 {{end}}

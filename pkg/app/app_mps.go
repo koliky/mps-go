@@ -23,5 +23,20 @@ func mpsCreateGroup(w http.ResponseWriter, r *http.Request) {
 	data := map[string]interface{}{
 		"api_url": apiURL,
 	}
+	search := r.URL.Query().Get("search")
+	data["search"] = search
 	view.MpsCreateGroup(w, data)
+}
+
+func mpsCreatePart(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{
+		"api_url": apiURL,
+	}
+	search := r.URL.Query().Get("search")
+	data["search"] = search
+	groupID := r.URL.Query().Get("id")
+	if len(groupID) != 0 {
+		data["id"] = groupID
+		view.MpsCreatePart(w, data)
+	}
 }

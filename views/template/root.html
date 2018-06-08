@@ -19,6 +19,23 @@
       {{template "root-layout" .}}
       {{template "root-body" .}}
       {{template "root-script" .}}
+      <script>
+      $.ajax({
+      type: 'GET',
+      contentType: 'application/json; charset=utf-8',
+      dataType: "json",
+      url: '{{.api_url}}/api/security/checkapionline',
+      error: function(err) {
+        Ext.MessageBox.show({
+          title: 'Warning',
+          msg: 'Server data offline',
+          buttons: Ext.MessageBox.OK,
+          animEl: 'mb9',
+          icon: Ext.MessageBox.WARNING
+        });
+      }
+    })
+    </script>
   </body>
 </html>
 {{end}}
