@@ -27,6 +27,11 @@ func MpsCreateGroup(w http.ResponseWriter, data interface{}) {
 	render(parseTemplate("mps/create-group.html"), w, data)
 }
 
+// MpsCreatePart render view
+func MpsCreatePart(w http.ResponseWriter, data interface{}) {
+	render(parseTemplate("mps/create-part.html"), w, data)
+}
+
 // AdminCreateUser render view
 func AdminCreateUser(w http.ResponseWriter, data interface{}) {
 	render(parseTemplate("admin/create-user.html"), w, data)
